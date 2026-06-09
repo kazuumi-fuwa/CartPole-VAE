@@ -1,17 +1,17 @@
 # CartPole On Latent Space
-This project shows how the CartPole environment appears in latent space.
+A Convolutional Variational Autoencoder (ConvVAE) trained on CartPole-v1 frames. The VAE learns to compress raw pixel observations into a compact 32-dimensional latent space — a key component of world model-based reinforcement learning agents.
 
 ## The latent space plot
 ![Latent space plot](cartpole_latent.png)
 
 ## What I built
 
-- 'Convolutional VAE':  3 convolution layer network
-- 'frame collections': run cartpole environments randomly and save the frames
-- use Adam to train
+- ConvVAE: 3-layer convolutional encoder compresses 64×64 RGB frames into a 32-dim latent vector; decoder reconstructs the frame from that vector
+- ReplayBuffer → collect_frames.py: 10,000 frames collected using random actions to cover the full state space (pole angles, cart positions)
+- Trained with ELBO loss: BCE reconstruction + KL divergence regularization, 20 epochs, Adam lr=1e-3
 
 ## What the latent space plot shows
-Color represents the pole angle and as closer to blue, the angle gets bigger. These plots look smooth and structured. This shows that the pole angle is learnable by using this latent space.
+The VAE was never given pole angle as a label — it only saw raw pixel frames. Yet the latent space organized itself so that pole angle varies smoothly and continuously across the space. Red regions correspond to the pole leaning left, blue to the right, with a smooth gradient between them. This emergent structure is what makes the latent space useful for a world model: a transition model can learn to navigate it predictably.
 
 ## Result
 
@@ -53,4 +53,7 @@ python latent_scatter.py. # plot the lattent space plot
 ```
 
 ## Connection to Phase 3
-This makes the world model be able to learn the space. 
+In Phase 3, a transition model will be trained to predict the next latent state zt+1z_{t+1}
+zt+1​ given the current state ztz_t
+zt​ and action ata_t
+at​. By operating in this structured latent space rather than raw pixel space, the world model can learn environment dynamics efficiently — imagining future frames without ever rendering them.
