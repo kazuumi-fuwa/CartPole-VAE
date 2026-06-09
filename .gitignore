@@ -1,0 +1,5 @@
+cartpole_frames/
+*.npy
+__pycache__/
+*.pyc
+.env
